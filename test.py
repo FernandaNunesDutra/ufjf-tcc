@@ -41,28 +41,26 @@ def readWatiItemData():
 
 def readAesUserItemMatrix():
     read = np.loadtxt("data_aes_ratings.csv", delimiter=',', skiprows=1, dtype='int')
-    matrix = np.empty((9167,30),dtype=np.int)
-    matrix[:] = -1
+    matrix = np.zeros((9167,30),dtype=np.int)
     for i,row in enumerate(read):
         matrix[row[0]][0] = row[0]
         matrix[row[0]][row[1]] = row[2]
     indexes = []
     for i, row in enumerate(matrix):
-        if row[0] == -1:
+        if row[0] == 0:
             indexes.append(i)
     matrix = np.delete(matrix, indexes, axis=0)
     return matrix[:,1:]
 
 def readWatiUserItemMatrix():
     read = np.loadtxt("data_wati_ratings.csv", delimiter=',', skiprows=1, dtype='int')
-    matrix = np.empty((1461,10),dtype=np.int)
-    matrix[:] = -1
+    matrix = np.zeros((1461,10),dtype=np.int)
     for i,row in enumerate(read):
         matrix[row[0]][0] = row[0]
         matrix[row[0]][row[1]] = row[2]
     indexes = []
     for i, row in enumerate(matrix):
-        if row[0] == -1:
+        if row[0] == 0:
             indexes.append(i)
     matrix = np.delete(matrix, indexes, axis=0)
     return matrix[:,1:]
@@ -95,13 +93,12 @@ def similarity(x,y):
 def getNeighbors(user, watiUserClusters):
 
     return users
+
 def main():
 
 
-
-
-    userData, userIndexes = readWatiUserData()
-    userItemMatrix = readWatiUserItemMatrix()
+    userData, userIndexes = readAesUserData()
+    userItemMatrix = readAesUserItemMatrix()
 
     userData = scaleData(userData)
     userClusters = kmeans(userData,10)
@@ -111,26 +108,24 @@ def main():
         for j, u2 in enumerate(userData):
             userSimilarityMatrix[i][j] = similarity(u1,u2)
 
-    predictions = np.empty((userItemMatrix.shape[0],userItemMatrix.shape[1],))
-    predictions[:] = -1
+    predictions = np.zeros((userItemMatrix.shape[0],userItemMatrix.shape[1],))
     for userIndex,userRow in enumerate(predictions):
-        cluster = userClusters[userIndex]
 
         ratingCount = 0
         ratingSum = 0
         for itemIndex, itemRating in enumerate(userRow):
-            if userItemMatrix[userIndex][itemIndex] != -1:
+            if userItemMatrix[userIndex][itemIndex] != 0:
                 ratingSum += userItemMatrix[userIndex][itemIndex]
                 ratingCount += 1
-        userMean =  ratingSum/ratingCount
+        userMean =  ratingSum/float(ratingCount)
 
         neighbors = []
-        for i,row in enumerate(userClusters):
-            if i != userIndex and userClusters[i] == cluster:
+        for i,cluster in enumerate(userClusters):
+            if i != userIndex and cluster == userClusters[userIndex]:
                 neighbors.append(i)
 
         for itemIndex, itemRating in enumerate(userRow):
-            if userItemMatrix[userIndex][itemIndex] == -1:
+            if userItemMatrix[userIndex][itemIndex] == 0:
                 ratingCount= 0
                 ratingSum = 0
                 for neighborIndex in neighbors:
@@ -138,22 +133,23 @@ def main():
                     neighborCount = 0
                     neighborSum = 0
                     for itemI, itemR in enumerate(userRow):
-                        if userItemMatrix[neighborIndex][itemI] != -1:
+                        if userItemMatrix[neighborIndex][itemI] != 0:
                             neighborSum += userItemMatrix[neighborIndex][itemI]
                             neighborCount += 1
-                    neighborMean =  neighborSum/neighborCount
+                    neighborMean =  neighborSum/float(neighborCount)
 
-                    if userItemMatrix[neighborIndex][itemIndex] != -1:
-                        ratingSum += (userItemMatrix[neighborIndex][itemIndex] -  neighborMean)* similarity(userData[userIndex], userData[neighborIndex])
-                        neighborCount += 1
-                predictions[userIndex][itemIndex] = userMean + ratingSum/neighborCount if neighborCount != 0 else -1
+                    if userItemMatrix[neighborIndex][itemIndex] != 0:
+                        ratingSum += (userItemMatrix[neighborIndex][itemIndex] - neighborMean)* similarity(userData[userIndex], userData[neighborIndex])
+                        ratingCount += similarity(userData[userIndex], userData[neighborIndex])
+                predictions[userIndex][itemIndex] = userMean + ratingSum/ratingCount if ratingCount != 0 else 0
 
+    print predictions
     for userIndex, userRow in enumerate(predictions):
-        ratings = userRow.argsort()[-3:][::-1]
+        recommendations = userRow.argsort()[-5:][::-1]
         print userIndexes[userIndex],
-        for rating in ratings:
-            if predictions[userIndex][rating] != -1:
-                print rating,
+        for recommendation in recommendations:
+            if predictions[userIndex][recommendation] != -1:
+                print recommendation,
         print \
 
 
