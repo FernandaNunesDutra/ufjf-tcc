@@ -5,6 +5,14 @@ from scipy.stats import pearsonr
 from datetime import datetime
 
 
+def readAesUserQuitData():
+    read = np.loadtxt("data_aes_users_quit.csv", delimiter=',', skiprows=1)
+    return read[:, 1:], read[:,0].astype(int)
+
+def readAesUserCutData():
+    read = np.loadtxt("data_aes_users_cut.csv", delimiter=',', skiprows=1)
+    return read[:, 1:], read[:,0].astype(int)
+
 def readAesUserData():
     read = np.loadtxt("data_aes_users.csv", delimiter=',', skiprows=1)
     return read[:, 1:], read[:,0].astype(int)
@@ -46,6 +54,19 @@ def readWatiItemData():
 def readAesUserItemMatrix():
     read = np.loadtxt("data_aes_ratings.csv", delimiter=',', skiprows=1, dtype='int')
     matrix = np.zeros((9167,30),dtype=np.int)
+    for i,row in enumerate(read):
+        matrix[row[0]][0] = row[0]
+        matrix[row[0]][row[1]] = row[2]
+    indexes = []
+    for i, row in enumerate(matrix):
+        if row[0] == 0:
+            indexes.append(i)
+    matrix = np.delete(matrix, indexes, axis=0)
+    return matrix[:,1:]
+
+def readAesUserItemQuitMatrix():
+    read = np.loadtxt("data_aes_ratings_quit.csv", delimiter=',', skiprows=1, dtype='int')
+    matrix = np.zeros((9167,9),dtype=np.int)
     for i,row in enumerate(read):
         matrix[row[0]][0] = row[0]
         matrix[row[0]][row[1]] = row[2]
@@ -99,7 +120,7 @@ def pearson(x,y):
     return pearsonr(x,y)[0]
 
 def similarity(x,y):
-    return metrics.pairwise.pairwise_distances(x.reshape(1, -1),y.reshape(1, -1),metric='manhattan')[0]
+    return metrics.pairwise.pairwise_distances(x.reshape(1, -1),y.reshape(1, -1),metric='cosine')[0]
 
 def ratingDensity(nClusters, userClusters, userItemMatrix):
     ratingRatio = []
@@ -122,12 +143,18 @@ def ratingDensity(nClusters, userClusters, userItemMatrix):
 def main():
     random.seed(datetime.now())
 
-    userData, userIndexes = readWatiUserData()
-    userItemMatrix = readWatiUserItemMatrix()
+    userData, userIndexes = readAesUserQuitData()
+    userItemMatrix = readAesUserItemQuitMatrix()
+    print userData.shape
     userData = scaleData(userData)
-    userClusters = agglomerative(userData,2,'manhattan')
+    nClusters = 2
+    userClusters = agglomerative(userData,2,'cosine')
+    print userClusters
+    print silhouetteScore(userData, userClusters,"cosine")
+    print ratingDensity(nClusters, userClusters, userItemMatrix)
 
     userSimilarityMatrix = np.empty((userData.shape[0],userData.shape[0],))
+    print userItemMatrix.shape
     for i, u1 in enumerate(userData):
         for j, u2 in enumerate(userData):
             userSimilarityMatrix[i][j] = similarity(u1,u2)
@@ -146,10 +173,10 @@ def main():
                     ratingSum = 0
                     for neighborIndex in neighbors:
                         sim = similarity(userData[userIndex],userData[neighborIndex])
-                        if(sim == 0):
-                            ratingSum += userItemMatrix[neighborIndex][itemIndex]
-                        else:
-                            ratingSum += userItemMatrix[neighborIndex][itemIndex] * (1/sim)
+                        #if(sim == 0):
+                        #    ratingSum += userItemMatrix[neighborIndex][itemIndex]
+                        #else:
+                        ratingSum += userItemMatrix[neighborIndex][itemIndex] * (sim)
                     predictions[userIndex][itemIndex] = ratingSum
         else:
             randItens = [x for x in range(userItemMatrix.shape[1])]
@@ -170,6 +197,27 @@ def main():
             if predictions[userIndex][recommendation] != -1:
                 print recommendation + 1,
         print \
+
+    print "RANDOMIZED"
+    for userIndex, userRow in enumerate(predictions):
+        if(userIndex % 2 == 1):
+            recommendations = userRow.argsort()[-3:][::-1]
+            print userIndexes[userIndex],
+            for recommendation in recommendations:
+                if predictions[userIndex][recommendation] != -1:
+                    print recommendation + 1,
+            print \
+
+    print "RECOMMENDED"
+    for userIndex, userRow in enumerate(predictions):
+        if(userIndex % 2 == 0):
+            recommendations = userRow.argsort()[-3:][::-1]
+            print userIndexes[userIndex],
+            for recommendation in recommendations:
+                if predictions[userIndex][recommendation] != -1:
+                    print recommendation + 1,
+            print \
+
 
 
 if __name__ == "__main__":
