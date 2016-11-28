@@ -154,6 +154,8 @@ def computeRecommendations(dataset,algorithm,nClusters,metric):
         for recommendation in recommendations:
             if predictions[userIndex][recommendation] > 0:
                 print recommendation + 1 ,
+            else:
+                print 0 ,
         print \
 
 def main():
