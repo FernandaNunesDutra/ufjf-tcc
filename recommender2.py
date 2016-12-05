@@ -95,22 +95,35 @@ def computeRecommendations(predictions):
 def main():
     random.seed(datetime.now())
 
-    dataset = 'wati'
-    nClusters = 5
+    dataset = 'aes'
+    nClusters = 2
     metric = 'cosine'
     algorithm = 'agglomerative'
+
+    print dataset, nClusters, metric, algorithm
 
     userData, userIds = readUserData(dataset)
     userData = scaleData(userData)
     userItemMatrix, userIds2 = readUserItemMatrix(dataset)
     userClusters = computeClusters(userData,algorithm,nClusters,metric)
 
+    labels=[]
+    for user in userItemMatrix:
+        if -1 in user:
+            labels.append(-1)
+        else:
+            labels.append(1)
 
-    print 'SILHOUETTE SCORE:', silhouetteScore(userData,userClusters,metric)
 
-    kf = model_selection.KFold(n_splits = 10, shuffle=False)
-    matrix = np.zeros((2,2,),dtype=int)
-    for trainIndex, testIndex in kf.split(userData):
+    print 'SILHOUETTE SCORE'
+    print silhouetteScore(userData,userClusters,metric)
+
+    kf = model_selection.StratifiedKFold(n_splits = 5, shuffle=False)
+    #matrix = np.zeros((2,2,),dtype=int)
+    recall = []
+    precision = []
+    for trainIndex, testIndex in kf.split(userData, labels):
+
         userDataTrain, userDataTest = userData[trainIndex], userData[testIndex]
         userIdsTrain, userIdsTest = userIds[trainIndex], userIds[testIndex]
         userItemMatrixTrain, userItemMatrixTest = userItemMatrix[trainIndex], userItemMatrix[testIndex]
@@ -126,13 +139,17 @@ def main():
                     truth.append(rating)
                     predicted.append(1) if predictions[i][j] > 0 else predicted.append(-1)
 
-        matrix_aux =  metrics.confusion_matrix(truth, predicted,labels=[1,-1])
+        #matrix_aux =  metrics.confusion_matrix(truth, predicted,labels=[1,-1])
+        recall.append(metrics.recall_score(truth, predicted, labels=[1,-1], pos_label=1, average='binary'))
+        precision.append(metrics.precision_score(truth, predicted, labels=[1,-1], pos_label=1, average='binary'))
 
-        for i,row in enumerate(matrix):
-            for j,elem in enumerate(row):
-                matrix[i][j] += matrix_aux[i][j]
-    print 'CONFUSION MATRIX:'
-    print matrix
+        #for i,row in enumerate(matrix):
+        #    for j,elem in enumerate(row):
+        #        matrix[i][j] += matrix_aux[i][j]
+    print 'AVERAGE RECALL'
+    print sum(recall)/len(recall)
+    print 'AVERAGE PRECISION'
+    print sum(recall)/len(recall)
 
 
 

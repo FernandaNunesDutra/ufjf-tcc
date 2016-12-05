@@ -1,0 +1,13 @@
+for e in for n in `seq 0 9` ; do
+    for n in `seq 2 10` ; do
+    	python -W ignore recommender3.py aes kmeans euclidean $n > ake$n-$e
+        python -W ignore recommender3.py aes agglomerative euclidean $n > aae$n-$e
+        python -W ignore recommender3.py aes agglomerative manhattan $n > aam$n-$e
+        python -W ignore recommender3.py aes agglomerative cosine $n > aac$n-$e
+        python -W ignore recommender3.py wati kmeans euclidean $n > wke$n-$e
+        python -W ignore recommender3.py wati agglomerative euclidean $n > wae$n-$e
+        python -W ignore recommender3.py wati agglomerative manhattan $n > wam$n-$e
+        python -W ignore recommender3.py wati agglomerative cosine $n > wac$n-$e
+    done
+done
+b

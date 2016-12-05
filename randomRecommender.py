@@ -75,15 +75,15 @@ def computePredictions(userIds,userIdsTest,userData,userDataTest,userItemMatrix,
             for itemIndex, itemRating in enumerate(userRow):
                 ratingSum = 0
                 #simSum = 0
-                for neighborIndex in neighbors:
-                    sim = similarity(userDataTest[userIndex],userData[neighborIndex],metric)
+                #for neighborIndex in neighbors:
+                    #sim = similarity(userDataTest[userIndex],userData[neighborIndex],metric)
                     #if userItemMatrix[neighborIndex][itemIndex] != 0:
                     #    simSum += sim
-                    ratingSum += userItemMatrix[neighborIndex][itemIndex] * (sim)
+                    #ratingSum += userItemMatrix[neighborIndex][itemIndex] * (sim)
                 #if simSum == 0:
                 #    simSum = 1
-                predictions[userIndex][itemIndex] = ratingSum
-
+                rand =  random.uniform(-1, 1)
+                predictions[userIndex][itemIndex] = rand
     return predictions
 
 def computeRecommendations(predictions, userItemMatrixTest):
@@ -108,13 +108,15 @@ def computeRecommendations(predictions, userItemMatrixTest):
 
 
 def main():
-    random.seed(datetime.now())
+
 
     dataset = argv[1]
     algorithm = argv[2]
     metric = argv[3]
     nClusters = int(argv[4])
+    seed = int(argv[5])
 
+    random.seed(5)
 
 
     userData, userIds = readUserData(dataset)
