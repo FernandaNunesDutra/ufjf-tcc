@@ -189,8 +189,10 @@ def main():
 
     print sum(averagePrecision)/len(averagePrecision)
     print sum(averageRecall)/len(averageRecall)
+    print sum(averageFmeasure)/len(averageFmeasure)
     print sum(averagePrecision1)/len(averagePrecision1)
     print sum(averageRecall1)/len(averageRecall1)
+    print sum(averageFmeasure1)/len(averageFmeasure1)
 
 
 
