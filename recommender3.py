@@ -114,7 +114,9 @@ def main():
     algorithm = argv[2]
     metric = argv[3]
     nClusters = int(argv[4])
+    seed = int(argv[5])
 
+    random.seed(seed)
 
 
     userData, userIds = readUserData(dataset)
@@ -134,8 +136,10 @@ def main():
 
     averagePrecision = []
     averageRecall = []
+    averageFmeasure = []
     averagePrecision1 = []
     averageRecall1 = []
+    averageFmeasure1 = []
 
     kf = model_selection.StratifiedKFold(n_splits = 5, shuffle=True)
     for trainIndex, testIndex in kf.split(userData,labels):
@@ -150,6 +154,7 @@ def main():
 
         precision = []
         recall = []
+        fmeasure = []
         for i, ratings in enumerate(userItemMatrixTest):
             truth = []
             predicted = []
@@ -159,12 +164,15 @@ def main():
                     predicted.append(recommendations[i][j])
             precision.append(metrics.precision_score(truth, predicted, labels=[1,-1], pos_label=1, average='binary'))
             recall.append(metrics.recall_score(truth, predicted, labels=[1,-1], pos_label=1, average='binary'))
+            fmeasure.append(metrics.f1_score(truth, predicted, labels=[1,-1], pos_label=1, average='binary'))
         averagePrecision.append(sum(precision)/len(precision))
         averageRecall.append(sum(recall)/len(recall))
+        averageFmeasure.append(sum(fmeasure)/len(fmeasure))
 
 
         precision = []
         recall = []
+        fmeasure =[ ]
         for i, ratings in enumerate(userItemMatrixTest):
             truth = []
             predicted = []
@@ -174,8 +182,10 @@ def main():
                     predicted.append(1) if predictions[i][j] > 0 else predicted.append(-1)
             precision.append(metrics.precision_score(truth, predicted, labels=[1,-1], pos_label=1, average='binary'))
             recall.append(metrics.recall_score(truth, predicted, labels=[1,-1], pos_label=1, average='binary'))
+            fmeasure.append(metrics.f1_score(truth, predicted, labels=[1,-1], pos_label=1, average='binary'))
         averagePrecision1.append(sum(precision)/len(precision))
         averageRecall1.append(sum(recall)/len(recall))
+        averageFmeasure1.append(sum(fmeasure)/len(fmeasure))
 
     print sum(averagePrecision)/len(averagePrecision)
     print sum(averageRecall)/len(averageRecall)
