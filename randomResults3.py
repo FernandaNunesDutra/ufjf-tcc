@@ -6,7 +6,7 @@ for file_name in aes_files:
 	for i in range(6):
 		metric_mean = []
 		for j in range(10):
-			with open('./out/'+file_name+'-'+str(j)) as f:
+			with open('./out3/'+file_name+'-'+str(j)) as f:
 	    			content = f.readlines()
 				metric_mean.append(float(content[i]))
 		print sum(metric_mean)/len(metric_mean)
@@ -16,7 +16,7 @@ for file_name in wati_files:
 	for i in range(6):
 		metric_mean = []
 		for j in range(10):
-			with open('./out/'+file_name+'-'+str(j)) as f:
+			with open('./out3/'+file_name+'-'+str(j)) as f:
 	    			content = f.readlines()
 				metric_mean.append(float(content[i]))
 		print sum(metric_mean)/len(metric_mean)

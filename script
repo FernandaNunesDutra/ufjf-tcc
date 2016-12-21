@@ -1,14 +1,12 @@
 for e in `seq 0 9` ; do
     for n in `seq 2 10` ; do
-    	python -W ignore recommender3.py aes kmeans euclidean $n $e > zout-ake$n-$e
-        python -W ignore recommender3.py aes agglomerative euclidean $n $e > zout-aae$n-$e
-        python -W ignore recommender3.py aes agglomerative manhattan $n $e > zout-aam$n-$e
-        python -W ignore recommender3.py aes agglomerative cosine $n $e > zout-aac$n-$e
-        python -W ignore randomRecommender.py aes $e > zout-ar-$e
-        python -W ignore recommender3.py wati kmeans euclidean $n $e > zout-wke$n-$e
-        python -W ignore recommender3.py wati agglomerative euclidean $n $e > zout-wae$n-$e
-        python -W ignore recommender3.py wati agglomerative manhattan $n $e > zout-wam$n-$e
-        python -W ignore recommender3.py wati agglomerative cosine $n $e > zout-wac$n-$e
-        python -W ignore randomRecommender.py wati $e > zout-wr-$e
+    	python -W ignore recommender.py aes kmeans euclidean $n $e > out/ake$n-$e
+        python -W ignore recommender.py aes agglomerative euclidean $n $e > out/aae$n-$e
+        python -W ignore recommender.py aes agglomerative manhattan $n $e > out/aam$n-$e
+        python -W ignore recommender.py aes agglomerative cosine $n $e > out/aac$n-$e
+        python -W ignore recommender.py wati kmeans euclidean $n $e > out/wke$n-$e
+        python -W ignore recommender.py wati agglomerative euclidean $n $e > out/wae$n-$e
+        python -W ignore recommender.py wati agglomerative manhattan $n $e > out/wam$n-$e
+        python -W ignore recommender.py wati agglomerative cosine $n $e > out/wac$n-$e
     done
 done

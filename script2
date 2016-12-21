@@ -1,0 +1,12 @@
+for e in `seq 0 9` ; do
+    for n in `seq 2 10` ; do
+    	python -W ignore recommender2.py aes kmeans euclidean $n $e > out2/ake$n-$e
+        python -W ignore recommender2.py aes agglomerative euclidean $n $e > out2/aae$n-$e
+        python -W ignore recommender2.py aes agglomerative manhattan $n $e > out2/aam$n-$e
+        python -W ignore recommender2.py aes agglomerative cosine $n $e > out2/aac$n-$e
+        python -W ignore recommender2.py wati kmeans euclidean $n $e > out2/wke$n-$e
+        python -W ignore recommender2.py wati agglomerative euclidean $n $e > out2/wae$n-$e
+        python -W ignore recommender2.py wati agglomerative manhattan $n $e > out2/wam$n-$e
+        python -W ignore recommender2.py wati agglomerative cosine $n $e > out2/wac$n-$e
+    done
+done

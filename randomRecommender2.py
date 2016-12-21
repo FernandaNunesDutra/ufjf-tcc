@@ -98,6 +98,11 @@ def main():
         userIdsTrain, userIdsTest = userIds[trainIndex], userIds[testIndex]
         userItemMatrixTrain, userItemMatrixTest = userItemMatrix[trainIndex], userItemMatrix[testIndex]
 
+        for i, user in enumerate(userItemMatrixTrain):
+            for j, item in enumerate(user):
+                if userItemMatrixTrain[i][j] == 0:
+                    userItemMatrixTrain[i][j] = -0.5
+
         predictions = computePredictions(userDataTest,userItemMatrix)
         recommendations = computeRecommendations(predictions,userItemMatrixTest)
 

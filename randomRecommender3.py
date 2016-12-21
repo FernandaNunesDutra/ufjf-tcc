@@ -76,7 +76,10 @@ def main():
     userData = scaleData(userData)
     userItemMatrix, userIds2 = readUserItemMatrix(dataset)
 
-
+    for i, user in enumerate(userItemMatrix):
+        for j, item in enumerate(user):
+            if userItemMatrix[i][j] == 0:
+                userItemMatrix[i][j] = -0.5
 
     labels=[]
     for user in userItemMatrix:

@@ -1,0 +1,4 @@
+for e in `seq 0 9` ; do
+        python -W ignore randomRecommender.py aes $e > out/zout-ar-$e
+        python -W ignore randomRecommender.py wati $e > out/zout-wr-$e
+done
